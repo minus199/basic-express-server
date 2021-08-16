@@ -3,10 +3,11 @@ const router = express.Router();
 const passport = require("passport");
 
 router.post("/register", (req, res, next) => {
+    const { email, password, foo } = req.body;
     new User({ email, password })
         .save()
         .then(user => res.json(user))
-        .catch(err => res.json({ message: err })); 
+        .catch(err => res.json({ message: err }));
 });
 
 router.get("/login", (req, res, next) => {

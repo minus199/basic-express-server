@@ -12,7 +12,7 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const devicesRouter = require('./routes/devices');
 const uploadRouter = require('./routes/upload');
-const loginRouter = require('./routes/login');
+const authRouter = require('./routes/auth');
 
 const mongoose = require("mongoose");
 
@@ -48,7 +48,7 @@ app.use(passport.session());
 
 // routers
 app.use('/', indexRouter);
-app.use("/auth", loginRouter);
+app.use("/auth", authRouter);
 app.use('/users', authCheck, usersRouter);
 app.use('/devices', authCheck, devicesRouter);
 app.use('/uploads', authCheck, uploadRouter);
