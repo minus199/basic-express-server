@@ -1,0 +1,1 @@
+express server with mongo + passport + sessions + file uploads
