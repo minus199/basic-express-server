@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤙 Old school website 🤙</title>
+    <link href="/stylesheets/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <fieldset>
+        <legend>Create new user</legend>
+        <input id="username" placeholder="email" />
+        <input id="password" type="password" placeholder="password" />
+        <button id="register">Register</button>
+        <span id='status'></span>
+        <div>
+            <h4>Raw response body: </h4>
+            <pre id='raw-response'></pre>
+        </div>
+    </fieldset>
+
+    <!-- todo: add login page/form -->
+    <!-- TODO: add logout button(frontend) + logout endpoint(backend) -->
+
+    <script type="text/javascript">
+        const jsonHeaders = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+        const $status = document.querySelector('#status')
+        const $rawResponse = document.querySelector('#raw-response')
+
+        const $username = document.querySelector("#username")
+        const $password = document.querySelector("#password")
+        document.querySelector("#register").addEventListener("click", (event) => {
+            fetch("/auth/register", {
+                method: 'POST',
+                headers: jsonHeaders,
+                body: JSON.stringify({ email: $username.value, password: $password.value, foo: "this is a custom field" })
+            })
+                .then(async res => {
+                    const user = await res.json(); //can be a user or an error
+
+                    //the <pre> tag is used to show unformatted text, good for code snippets like json(without any css)
+                    $rawResponse.innerText = `${JSON.stringify(user, null, 4)}`
+
+                    if (res.status === 200) {
+                        // dont use innerHTML to create elements!! im just lazy an its a very simple html
+                        $status.innerHTML = `Created user <b>${user._id}</b> on <i>${user.date}</i>`
+
+                        return user
+                    }
+
+                    $status.innerText = `Unable to create user - ${user.message}` // here user represent the error
+                })
+                .catch(reason => {
+                    $rawResponse.innerText = `${JSON.stringify(reason, null, 4)}`
+                    $status.innerText = `You or the server are probably offline `
+                })
+        })
+    </script>
+</body>
+
+</html>

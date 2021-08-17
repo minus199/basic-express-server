@@ -2,17 +2,21 @@ const User = require("./models/user");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
+// try to put a breakpoint inside the functions below to see when it happens
+
+//Serialization is converting an instance to a primitive form which can be stored outside the runtime(like a string/json/number)
 passport.serializeUser((user, done) => done(null, user.id));
 
+//Deserialization is taking the primitve form and constructing it to the instance it was before
 passport.deserializeUser((id, done) => User.findById(id, (err, user) => {
     done(err, user);
 }));
 
-const findOrCreateUser = (email, password, done) => User.findOne({ email: email })
+const tryLoadUser = (email, password, done) => User.findOne({ email })
     .then(user => {
         if (!user) {
             // if user not found, create a new user
-            return done(null, false, { message: "user does not existss" });
+            return done(null, false, { message: "We do not have a user with the given email. Perhaps register?" });
         }
 
         // user found, check password
@@ -24,7 +28,7 @@ const findOrCreateUser = (email, password, done) => User.findOne({ email: email 
     })
     .catch(err => done(null, false, { message: err }))
 
-passport.use(new LocalStrategy({ usernameField: "email" }, findOrCreateUser));
+passport.use(new LocalStrategy({ usernameField: "email" }, tryLoadUser));
 
 // Local Strategy -- 'real life' example with password hashing
 /*

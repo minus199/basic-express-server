@@ -3,6 +3,12 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+#app{
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}
+
 a {
   color: #00B7FF;
 }

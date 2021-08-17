@@ -1,13 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const {resolvePublicPath} = require("../path-utils")
+const User = require("../models/user");
+
+router.get('/register', (req, res, next) => {
+    if (req.user){
+        // if user already loggedin, redirect to homepage (this is for Baruch :D )
+        return res.status(304).redirect("/")
+    }
+    res.sendFile(resolvePublicPath("register.html"))
+})
 
 router.post("/register", (req, res, next) => {
     const { email, password, foo } = req.body;
     new User({ email, password })
         .save()
         .then(user => res.json(user))
-        .catch(err => res.json({ message: err }));
+        .catch(err => res.status(409).json(err));
 });
 
 router.get("/login", (req, res, next) => {
@@ -30,5 +40,7 @@ router.get("/login", (req, res, next) => {
         });
     })(req, res, next);
 });
+
+//todo: logout should be added here
 
 module.exports = router;
