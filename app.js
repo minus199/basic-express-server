@@ -14,18 +14,11 @@ const devicesRouter = require('./routes/devices');
 const uploadRouter = require('./routes/upload');
 const authRouter = require('./routes/auth');
 
-const mongoose = require("mongoose");
+const connectToMongo = require("./db")
+
+connectToMongo()
 
 const app = express();
-
-// mongo db
-const DB_NAME = 'express-js-lab'
-const MONGO_URI = `mongodb://127.0.0.1:27017/${DB_NAME}`;
-
-mongoose
-    .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(console.log(`MongoDB connected ${MONGO_URI}`))
-    .catch(err => console.log(err));
 
 // General middlewares
 app.use(logger('dev'));
