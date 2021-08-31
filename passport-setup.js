@@ -28,6 +28,7 @@ const tryLoadUser = (email, password, done) => User.findOne({ email })
     })
     .catch(err => done(null, false, { message: err }))
 
+    //TODO: Should has the password, plain text is bad
 passport.use(new LocalStrategy({ usernameField: "email" }, tryLoadUser));
 
 // Local Strategy -- 'real life' example with password hashing

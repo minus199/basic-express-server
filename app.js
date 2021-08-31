@@ -2,21 +2,28 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const passport = require("./passport-setup");
-const session = require("express-session");
 
+//Make sure to npm install/yarn install passport
+const passport = require("./passport-setup");
+//Make sure to npm install/yarn install express-session
+const session = require("express-session");
 const authCheck = require("./middleware/authCheck")
+
+const cors = require("cors")
+
 
 const indexRouter = require('./routes/index');
 const devicesRouter = require('./routes/devices');
 const uploadRouter = require('./routes/upload');
 const authRouter = require('./routes/auth');
+const dictionaryRouter = require("./routes/dictionary")
 
 const connectToMongo = require("./db")
 
 connectToMongo()
 
 const app = express();
+app.use(cors());
 
 // General middlewares
 app.use(logger('dev'));
@@ -26,7 +33,7 @@ app.use(cookieParser());
 
 // session middleware
 app.use(session({
-  secret: 'my-super-secret-session-key',
+  secret: 'my-super-secret-session-key', //todo: load from file
   resave: false,
   saveUninitialized: true,
   cookie: {}
@@ -37,10 +44,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // routers
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use("/auth", authRouter);
-app.use('/devices', authCheck, devicesRouter);
-app.use('/uploads', authCheck, uploadRouter);
+app.use('/api/devices', authCheck, devicesRouter);
+app.use('/api/dictionary', dictionaryRouter)
+app.use('/api/uploads', authCheck, uploadRouter);
 /*
   todo: add users router that can do the following:
   GET /users/:email to get a user by email 
@@ -53,7 +61,14 @@ app.use('/uploads', authCheck, uploadRouter);
 /* please notice that all html are served from the routers instead from the public dir. 
 This is because the routers are secured(only logged-in users can access) 
 We want to hide these pages from users which are not logged in */
-app.use(express.static(path.join(__dirname, 'public')));
+// const dynamicPath = path.join(__dirname, '../', 'hello-world-react/build')
+
+const buildPath = process.env['DICTIONARY_FE_BUILD_PATH']
+if (buildPath) {
+  console.log(`Hosting static content from ${buildPath}`)
+  app.use(express.static(buildPath));
+}
+
 
 // Error handling
 // if all routers have failed to catch this request, or error has occured

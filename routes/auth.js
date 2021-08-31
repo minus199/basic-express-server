@@ -4,13 +4,13 @@ const passport = require("passport");
 const {resolvePublicPath} = require("../path-utils")
 const User = require("../models/user");
 
-router.get('/register', (req, res, next) => {
-    if (req.user){
-        // if user already loggedin, redirect to homepage (this is for Baruch :D )
-        return res.status(304).redirect("/")
-    }
-    res.sendFile(resolvePublicPath("register.html"))
-})
+// router.get('/register', (req, res, next) => {
+//     if (req.user){
+//         // if user already loggedin, redirect to homepage (this is for Baruch :D )
+//         return res.status(304).redirect("/")
+//     }
+//     res.sendFile(resolvePublicPath("register.html"))
+// })
 
 router.post("/register", (req, res, next) => {
     const { email, password, foo } = req.body;
