@@ -45,7 +45,8 @@ app.use(passport.session());
 
 // routers
 // app.use('/', indexRouter);
-app.use("/auth", authRouter);
+//It is better to mark all the api routers with the route prefix 'api'
+app.use("/api/auth", authRouter);
 app.use('/api/devices', authCheck, devicesRouter);
 app.use('/api/dictionary', dictionaryRouter)
 app.use('/api/uploads', authCheck, uploadRouter);
@@ -58,17 +59,29 @@ app.use('/api/uploads', authCheck, uploadRouter);
   Add ui for all the new endpoints
 */
 
-/* please notice that all html are served from the routers instead from the public dir. 
-This is because the routers are secured(only logged-in users can access) 
-We want to hide these pages from users which are not logged in */
-// const dynamicPath = path.join(__dirname, '../', 'hello-world-react/build')
 
+/*
+  This is how we can specify the build directory/path dynamically by using an environment variable. 
+  If the env var is not set, no static content will be hosted.
+*/
 const buildPath = process.env['DICTIONARY_FE_BUILD_PATH']
 if (buildPath) {
-  console.log(`Hosting static content from ${buildPath}`)
-  app.use(express.static(buildPath));
-}
+  const static = express.static(buildPath)
 
+  console.log(`Hosting static content from ${buildPath}`)
+  app.use((req, res, next) => {
+    console.log(`Resolving static url ${req.url}`)
+
+    // This is how we prevent the server from intercepting requests in case we use react router
+    if (req.url.startsWith("/static")) {
+      console.log(`Serving static content ${req.url}`)
+      return static(req, res, next)
+    }
+
+    console.log(`Serving react index.html to allow react router to do its thing -- ${req.url}`)
+    res.sendFile(path.join(buildPath, 'index.html'))
+  })
+}
 
 // Error handling
 // if all routers have failed to catch this request, or error has occured
